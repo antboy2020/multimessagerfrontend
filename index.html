@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <!-- <title>Blue Ske E-Learn Challenge</title> -->
+    <!-- Add this to <head> -->
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+
+    <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        u {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="vm">
+        <b-container fluid style="width: 50%; margin: 0">
+            <b-row>
+                <b-col sm="2">
+                    <label for="textarea-small">Numbers:</label>
+                </b-col>
+                <b-col sm="10">
+                    <b-form-textarea id="textarea-numbers" size="sm" placeholder="Small textarea"></b-form-textarea>
+                </b-col>
+            </b-row>
+        </b-container>
+        <br>
+        <b-container fluid style="width: 50%; margin: 0">
+            <b-row>
+                <b-col sm="2">
+                    <label for="textarea-small">Addresses:</label>
+                </b-col>
+                <b-col sm="10">
+                    <b-form-textarea id="textarea-addresses" size="sm" placeholder="Small textarea"></b-form-textarea>
+                </b-col>
+            </b-row>
+        </b-container>
+        <br>
+        <b-container fluid style="width: 50%; margin: 0">
+            <b-row>
+                <b-col sm="2">
+                    <label for="textarea-small">Message-Body:</label>
+                </b-col>
+                <b-col sm="10">
+                    <b-form-textarea id="textarea-message-body" size="sm" placeholder="Small textarea">
+                    </b-form-textarea>
+                </b-col>
+            </b-row>
+        </b-container>
+        <br>
+        <b-button variant="primary" style="margin-left: 5%" @click="sendMessages()">Send</b-button>
+    </div>
+    <script type="text/javascript">
+
+        var app = new Vue({
+            el: '#vm',
+            data: {
+                numbersList: [],
+                addressList: [],
+            },
+            mounted() { },
+            methods: {
+                sendMessages() {
+                    this.numbersList = []
+                    document.getElementById('textarea-numbers').value.split('\n').forEach(number => {
+                        this.numbersList.push(number.replace(/\D+/g, ''));
+                    });
+                    document.getElementById('textarea-addresses').value.split('\n').forEach(address => {
+                        this.addressList.push(address.replace(/\./g, ''));
+                    });
+                    let messageBody = document.getElementById('textarea-message-body').value;
+                    const res = axios.post('http://localhost:3000/sendMessages', {
+                        numbers: this.numbersList,
+                        addresses: this.addressList,
+                        messageBody: messageBody,
+                    }).then(res => console.log(res))
+                        .catch(err => console.log('Login: ', err));;
+                },
+            },
+        });
+    </script>
+</body>
+
+</html>

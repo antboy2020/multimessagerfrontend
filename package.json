@@ -1,0 +1,15 @@
+{
+  "name": "blueskyfechallenge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "requirejs": "^2.3.6",
+    "serve": "^11.3.2"
+  }
+}
