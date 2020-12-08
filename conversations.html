@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <!-- <title>Blue Ske E-Learn Challenge</title> -->
+    <!-- Add this to <head> -->
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+
+    <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        u {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="vm">
+        <template>
+            <div>
+                <b-table :striped="striped" :bordered="bordered" :borderless="borderless" :outlined="outlined"
+                    :small="small" :hover="hover" :dark="dark" :fixed="fixed" :foot-clone="footClone"
+                    :no-border-collapse="noCollapse" :items="items" :fields="fields" :head-variant="headVariant"
+                    :table-variant="tableVariant">
+
+                    <!-- <template v-slot:row-details="data">
+                        <h1>hello</h1>
+                        <div v-for="message in allMessages">
+                            <h1>hello</h1>
+                        </div>
+                    </template> -->
+                    <template v-slot:row-details="data">
+                        <div v-for="event in data.item">
+                            <b-row class="mb-2">
+                                <b-col sm="3" class="text-sm-right"><b>Number:</b></b-col>
+                                <b-col>{{ event }}</b-col>
+                            </b-row>
+                        </div>
+                    </template>
+                </b-table>
+            </div>
+        </template>
+        <template>
+            <div>
+                <b-table striped hover :items="items" :fields="fields"></b-table>
+            </div>
+        </template>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#vm',
+            data: {
+                allMessages: {},
+                conversations: {},
+                fields: ['Number', 'Message', 'Date'],
+                items: [],
+                striped: false,
+                bordered: true,
+                borderless: false,
+                outlined: false,
+                small: false,
+                hover: false,
+                dark: true,
+                fixed: false,
+                footClone: false,
+                headVariant: null,
+                tableVariant: '',
+                noCollapse: false
+            },
+            mounted() {
+                axios.get('http://localhost:3000/retrieveMessages'
+                ).then(res => {
+                    this.allMessages = res.data['allMessages'];
+                    this.conversations = res.data['conversations'];
+                    this.items = Object.keys(this.allMessages);
+                    console.log(res.data.get('allMessages'))
+                }).catch(err => console.log(err));
+            },
+            methods: {},
+        });
+    </script>
+</body>
+
+</html>

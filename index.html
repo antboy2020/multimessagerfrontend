@@ -68,7 +68,8 @@
             mounted() { },
             methods: {
                 sendMessages() {
-                    this.numbersList = []
+                    this.numbersList = [];
+                  this.addressList = [];
                     document.getElementById('textarea-numbers').value.split('\n').forEach(number => {
                         this.numbersList.push(number.replace(/\D+/g, ''));
                     });
@@ -81,7 +82,7 @@
                         addresses: this.addressList,
                         messageBody: messageBody,
                     }).then(res => console.log(res))
-                        .catch(err => console.log('Login: ', err));;
+                        .catch(err => console.log('Login: ', err));
                 },
             },
         });
