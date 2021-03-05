@@ -7,6 +7,7 @@
     <!-- Add this to <head> -->
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 
     <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
@@ -16,74 +17,251 @@
         u {
             cursor: pointer;
         }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            width: 5px;
+            background: #f5f5f5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            width: 1em;
+            background-color: #ddd;
+            outline: 1px solid slategrey;
+            border-radius: 1rem;
+        }
+
+        .text-small {
+            font-size: 0.9rem;
+        }
+
+        .messages-box,
+        .chat-box {
+            height: 510px;
+            overflow-y: scroll;
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        input::placeholder {
+            font-size: 0.9rem;
+            color: #999;
+        }
     </style>
 </head>
 
 <body>
     <div id="vm">
-        <template>
-            <div>
-                <b-table :striped="striped" :bordered="bordered" :borderless="borderless" :outlined="outlined"
-                    :small="small" :hover="hover" :dark="dark" :fixed="fixed" :foot-clone="footClone"
-                    :no-border-collapse="noCollapse" :items="items" :fields="fields" :head-variant="headVariant"
-                    :table-variant="tableVariant">
+        <b-jumbotron>
+            <template v-slot:header>Conversations</template>
+            <a href="/">messaging</a>
 
-                    <!-- <template v-slot:row-details="data">
-                        <h1>hello</h1>
-                        <div v-for="message in allMessages">
-                            <h1>hello</h1>
-                        </div>
-                    </template> -->
-                    <template v-slot:row-details="data">
-                        <div v-for="event in data.item">
-                            <b-row class="mb-2">
-                                <b-col sm="3" class="text-sm-right"><b>Number:</b></b-col>
-                                <b-col>{{ event }}</b-col>
-                            </b-row>
-                        </div>
-                    </template>
-                </b-table>
+        </b-jumbotron>
+        <div>
+            <h1 v-if="conversations" style="text-align: center;">Conversations</h1>
+            <div v-else class="spinner-border" style="margin-left: 45%"></div>
+            <div v-for="(value, propertyName) in conversations" :key="conversations"
+                style="margin-left: 10%; zoom: 1; width: 80%; text-align: center;">
+                <hr>
+                {{propertyName}} <b-button variant="link" style="display: inline-block; width: 35%" v-b-modal.modal-1
+                    @click="setMessages(value, propertyName)">
+                    {{value[value.length
+                    -
+                    1].body.slice(0,27)}}</b-button> {{new Date(value[value.length -
+                1].dateSent).toString().slice(0,24)}}
+                <div v-if="value[value.length - 1].errorCode == null"
+                    style="display: inline-block; background-color: green; width: 5px; height: 5px;"></div>
+                <div v-else style="display: inline-block; background-color: red; width: 5px; height: 5px;"></div>
+
             </div>
-        </template>
-        <template>
-            <div>
-                <b-table striped hover :items="items" :fields="fields"></b-table>
+
+        </div>
+        <br>
+        <br>
+        <br>
+        <div>
+            <h1 v-if="conversations" style="text-align: center;">Remaining Sent</h1>
+            <div v-for="(value, propertyName) in remainingMessages" :key="remainingMessages"
+                style="margin-left: 10%; zoom: 1; width: 80%; text-align: center;">
+                <hr>
+                {{propertyName}} <b-button variant="link" style="display: inline-block; width: 35%" v-b-modal.modal-1
+                    @click="setMessages(value, propertyName)">
+                    {{value[value.length
+                    -
+                    1].body.slice(0,27)}}</b-button> {{new Date(value[value.length -
+                1].dateSent).toString().slice(0,24)}}
+                <div v-if="value[value.length - 1].errorCode == null"
+                    style="display: inline-block; background-color: green; width: 5px; height: 5px;"></div>
+                <div v-else style="display: inline-block; background-color: red; width: 5px; height: 5px;"></div>
+
             </div>
-        </template>
+            <b-modal id="modal-1" title="Messenger" @hide="clearIntervals">
+                <div class="container">
+                    <!-- Chat Box-->
+                    <div class="col-7 px-0" style="max-width: 100%;">
+                        <div id="chat-box" class="chat-box bg-white">
+                            <!-- Iterate through messages array and output v-if sender or receiver message -->
+                            <div v-for="message in currentMessagesDisplayed" :key="currentMessagesDisplayed">
+                                <div v-if="message.direction == 'inbound'">
+                                    <div class="media w-50 mb-3">
+                                        <!-- <img
+                                            src="https://res.cloudinary.com/mhmd/image/upload/v1564960395/avatar_usae7z.svg"
+                                            alt="user" width="50" class="rounded-circle"> -->
+                                        <div class="media-body ml-3">
+                                            <div class="bg-light rounded py-2 px-3 mb-2">
+                                                <p class="text-small mb-0 text-muted">
+                                                    {{message.body}}
+                                                </p>
+                                            </div>
+                                            <p class="small text-muted">{{new
+                                                Date(message.dateSent).toString().slice(0,24)}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <div class="media w-50 ml-auto mb-3">
+                                        <div class="media-body">
+                                            <div class="bg-primary rounded py-2 px-3 mb-2">
+                                                <p class="text-small mb-0 text-white">
+                                                    {{message.body}}
+                                                </p>
+                                            </div>
+                                            <p class="small text-muted">{{new
+                                                Date(message.dateSent).toString().slice(0,24)}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Typing area -->
+                        <!-- <form action="#" class="bg-light"> -->
+                        <div class="input-group">
+                            <input type="text" placeholder="Type a message" aria-describedby="button-addon2"
+                                class="form-control rounded-0 border-0 py-4 bg-light" id="written-message">
+                            <div class="input-group-append">
+                                <button id="button-addon2" class="btn btn-link" @click="sendMessage()"> <i
+                                        class="fa fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                        <!-- </form> -->
+
+                    </div>
+                </div>
+            </b-modal>
+        </div>
+
     </div>
-    <script>
+
+    </div>
+    <script type="text/javascript">
+
+        const items = [];
         var app = new Vue({
             el: '#vm',
             data: {
-                allMessages: {},
-                conversations: {},
-                fields: ['Number', 'Message', 'Date'],
-                items: [],
-                striped: false,
-                bordered: true,
-                borderless: false,
-                outlined: false,
-                small: false,
-                hover: false,
-                dark: true,
-                fixed: false,
-                footClone: false,
-                headVariant: null,
-                tableVariant: '',
-                noCollapse: false
+                currentMessagesDisplayed: [],
+                numbersList: [],
+                addressList: [],
+                currentNumber: null,
+                remainingMessages: null,
+                conversations: null,
+                intervalSetter: [],
             },
             mounted() {
-                axios.get('http://localhost:3000/retrieveMessages'
-                ).then(res => {
-                    this.allMessages = res.data['allMessages'];
-                    this.conversations = res.data['conversations'];
-                    this.items = Object.keys(this.allMessages);
-                    console.log(res.data.get('allMessages'))
-                }).catch(err => console.log(err));
+                this.retrieveMessages();
+                setInterval(this.retrieveMessages, 10000);
+                // $(this.$refs.buemodal).on("hidden.bs.modal", ()=> {
+
+                // });
             },
-            methods: {},
+            methods: {
+                clearIntervals() {
+                    this.intervalSetter.forEach(interval => {
+                        clearInterval(interval);
+                    });
+                    this.intervalSetter = [];
+                },
+                retrieveMessages() {
+                    axios.get('http://localhost:3000/retrieveMessages').then(response => {
+                        this.conversations = response.data.conversations;
+                        this.remainingMessages = response.data.remainingMessages;
+                    }).catch(err =>
+                        console.log(err)
+                    );
+
+                },
+                setMessages(value, currentNumber) {
+                    this.currentMessagesDisplayed = value.reverse();
+                    this.currentNumber = currentNumber;
+                    // let scrollingInterval = setInterval(() => {
+                    //     var element = document.getElementById("chat-box");
+                    //     if (element) {
+                    //         var elementHeight = element.scrollHeight;
+                    //         if (element.scrollTop != elementHeight)
+                    //             element.scrollTop = elementHeight;
+                    //         clearInterval(scrollingInterval);
+                    //     }
+                    // }, 100);
+                    let conversationMessagesInterval = setInterval(() => { this.getMessages(this.currentNumber) }, 1000)
+                    this.intervalSetter.push(conversationMessagesInterval);
+                },
+                sendMessage() {
+                    this.numbersList = [];
+                    this.addressList = [];
+                    this.numbersList.push(this.currentNumber);
+                    let messageBody = document.getElementById('written-message').value;
+                    document.getElementById('written-message').value = '';
+                    console.log(messageBody);
+                    console.log(this.numbersList);
+                    axios.post('http://localhost:3000/sendMessage', {
+                        to: this.currentNumber,
+                        from: this.currentMessagesDisplayed[0].direction == 'inbound' ?
+                            this.currentMessagesDisplayed[0].to :
+                            this.currentMessagesDisplayed[0].from,
+                        message: messageBody,
+                    }).then(res => {
+                        // this.getMessages(this.currentNumber);
+                        // setInterval(() => { this.getMessages(this.currentNumber) }, 1000)
+                        this.retrieveMessages();
+                    }).catch(err => {
+                        console.log(err);
+                    })
+
+                },
+                getMessages(clientNumber) {
+                    axios.get('http://localhost:3000/getMessages', { params: { clientNumber: clientNumber } }).then(res => {
+                        console.log(res);
+                        this.currentMessagesDisplayed = res.data.reverse();
+                        var element = document.getElementById("chat-box");
+                        // if (element) {
+                        //     var elementHeight = element.scrollHeight;
+                        //     if (element.scrollTop != elementHeight)
+                        //         element.scrollTop = elementHeight;
+                        // }
+                        // let scrollingInterval = setInterval(() => {
+                        //     var element = document.getElementById("chat-box");
+                        //     if (element) {
+                        //         var elementHeight = element.scrollHeight;
+                        //         element.scrollTop = elementHeight;
+                        //         clearInterval(scrollingInterval);
+                        //     }
+                        // }, 500);
+                    }).catch(err => {
+                        console.log(err);
+                    });
+                },
+
+            },
         });
     </script>
+
 </body>
 
 </html>

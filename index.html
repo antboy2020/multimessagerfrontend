@@ -16,44 +16,48 @@
         u {
             cursor: pointer;
         }
+
+        .lined-textarea {
+            background: url(http://i.imgur.com/2cOaJ.png);
+            background-attachment: local;
+            background-repeat: no-repeat;
+            padding-left: 35px;
+            padding-top: 10px;
+            border-color: #ccc;
+            font-size: 13px;
+            line-height: 16px;
+            resize: none;
+            margin-left: 15px;
+            margin-bottom: 20%;
+        }
     </style>
 </head>
 
 <body>
     <div id="vm">
-        <b-container fluid style="width: 50%; margin: 0">
-            <b-row>
-                <b-col sm="2">
-                    <label for="textarea-small">Numbers:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-textarea id="textarea-numbers" size="sm" placeholder="Small textarea"></b-form-textarea>
-                </b-col>
-            </b-row>
-        </b-container>
-        <br>
-        <b-container fluid style="width: 50%; margin: 0">
-            <b-row>
-                <b-col sm="2">
-                    <label for="textarea-small">Addresses:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-textarea id="textarea-addresses" size="sm" placeholder="Small textarea"></b-form-textarea>
-                </b-col>
-            </b-row>
-        </b-container>
-        <br>
-        <b-container fluid style="width: 50%; margin: 0">
-            <b-row>
-                <b-col sm="2">
-                    <label for="textarea-small">Message-Body:</label>
-                </b-col>
-                <b-col sm="10">
-                    <b-form-textarea id="textarea-message-body" size="sm" placeholder="Small textarea">
-                    </b-form-textarea>
-                </b-col>
-            </b-row>
-        </b-container>
+        <b-jumbotron>
+            <template v-slot:header>Messaging</template>
+            <a href="/conversations">conversations</a>
+        </b-jumbotron>
+        <div style="margin-left: 5%">
+            <div style="display: inline-block; width: 30%; height: 300px">
+                <label for="textarea-small">Numbers:</label>
+                <b-form-textarea id="textarea-numbers" size="sm" placeholder="Small textarea" class="lined-textarea"
+                    style="height: 90%;"></b-form-textarea>
+            </div>
+            <div style="display: inline-block; width: 30%; height: 300px">
+                <label for="textarea-small">Addresses:</label>
+                <b-form-textarea id="textarea-addresses" size="sm" placeholder="Small textarea" class="lined-textarea"
+                    style="height: 90%;"></b-form-textarea>
+            </div>
+            <div style="display: inline-block; width: 30%; height: 300px">
+                <label for="textarea-small">Message-Body:</label>
+                <b-form-textarea id="textarea-message-body" size="sm" placeholder="Small textarea"
+                    style="margin-left: 15px; margin-bottom: 20%; height: 90%;">
+                </b-form-textarea>
+            </div>
+
+        </div>
         <br>
         <b-button variant="primary" style="margin-left: 5%" @click="sendMessages()">Send</b-button>
     </div>
@@ -69,7 +73,7 @@
             methods: {
                 sendMessages() {
                     this.numbersList = [];
-                  this.addressList = [];
+                    this.addressList = [];
                     document.getElementById('textarea-numbers').value.split('\n').forEach(number => {
                         this.numbersList.push(number.replace(/\D+/g, ''));
                     });
